@@ -17,12 +17,15 @@
     "@angular/forms": "^22.0.0",
     "@angular/platform-browser": "^22.0.0",
     "@angular/router": "^22.0.0",
+    "cors": "^2.8.6",
     "daisyui": "^5.6.10",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.5",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.0.5",
+    "@angular/build": "^21.2.18",
     "@angular/cli": "^22.0.5",
     "@angular/compiler-cli": "^22.0.0",
     "@tailwindcss/postcss": "^4.3.2",
