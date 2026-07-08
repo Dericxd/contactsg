@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { GeniacareLayout } from '../layouts/geniacare-layout/geniacare-layout';
+import { StaffPage } from './pages/staff-page/staff-page';
 
 export const contactsRoutes: Routes = [
   {
@@ -8,8 +9,8 @@ export const contactsRoutes: Routes = [
     children: [
       //? User
       {
-        path: 'by-user',
-        // component: ByUserComponent
+        path: 'by-staff',
+        component: StaffPage
       },
 
       //? Departamento
@@ -17,7 +18,7 @@ export const contactsRoutes: Routes = [
       //? Lugar
       {
         path: '**',
-        redirectTo: ''
+        redirectTo: 'by-staff'
       }
     ]
   }
