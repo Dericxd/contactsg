@@ -1,4 +1,4 @@
-<div class="overflow-x-auto">
+<!-- <div class="overflow-x-auto">
   @if (isLoading()) {
     <div class="flex justify-center p-4">
       <span class="loading loading-spinner loading-lg"></span>
@@ -38,3 +38,30 @@
     </table>
   }
 </div>
+ -->
+
+
+ <table class="table table-md mt-2 w-full">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre Completo</th>
+      <th>Ficha</th>
+      <th>C.I.</th>
+      <th>CECO</th>
+      <th>Fecha Ingreso</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (user of person(); track user.id) {
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.name }} {{ user.last_name }}</td>
+        <td>{{ user.card }}</td>
+        <td>{{ user.ci }}</td>
+        <td>{{ user.ceco }}</td>
+        <td>{{ user.date_in }}</td>
+      </tr>
+    }
+  </tbody>
+ </table>

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { GeniacareLayout } from '../layouts/geniacare-layout/geniacare-layout';
 import { StaffPage } from './pages/staff-page/staff-page';
+import { CreatePage } from './pages/create-page/create-page';
 
 export const contactsRoutes: Routes = [
   {
@@ -13,7 +14,11 @@ export const contactsRoutes: Routes = [
         component: StaffPage
       },
 
-      //? Departamento
+      //? Crear
+      /* {
+        path: 'create',
+        component: CreatePage
+      }, */
 
       //? Lugar
       {

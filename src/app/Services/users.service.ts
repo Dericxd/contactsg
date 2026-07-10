@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, delay, map, Observable, of, tap, throwError } from 'rxjs';
 import { User } from '../models/User';
 
-const apiUrl = 'http://localhost:3000/contacts/staff';
+const apiUrl = 'http://localhost:3000/contacts';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +36,7 @@ export class UsersService {
   //? buscar usuarios por query
   searchUsers(query: string): Observable<User[]> {
 
-    query = query.toLocaleLowerCase();
+    query = query.toLocaleLowerCase(); 
 
     if (this.queryCacheUser.has(query)) {
       return of (this.queryCacheUser.get(query) ?? []);
@@ -44,11 +44,11 @@ export class UsersService {
 
     console.log('Searching users with query:', query);
 
-    return this.http.get<User[]>(`${apiUrl}/staff/${ query }`)
+    return this.http.get<User[]>(`${apiUrl}/staff/search/${ query }`)
       .pipe(
-        map((resp) => UserInterface(resp)),
+        map((resp: User[]) => resp),
         tap((users) => this.queryCacheUser.set(query, users)),
-        delay(2500),
+        delay(300),
         catchError((error) => {
           console.error('Error searching users:', error);
           return throwError(

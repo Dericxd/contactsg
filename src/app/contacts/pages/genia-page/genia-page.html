@@ -1,15 +1,15 @@
 <!-- -->
-<!-- @if (countryResource.error()) {
-  <app-not-found />
-} -->
-<!--
-@if (countryResource.isLoading()) {
+@if (staffResource.error()) {
+  <not-found />
+}
+
+@if (staffResource.isLoading()) {
   <h2 class="text-3xl">
     Cargando
     <span class="loading loading-infinity loading-xs text-info"></span>
   </h2>
-} -->
+}
 <!--  -->
-<!-- @if (countryResource.hasValue()) {
-  <country-information-page [country]="countryResource.value()!" />
+<!-- @if (staffResource.hasValue()) {
+  <country-information-page [users]="staffResource.value()!" />
 } -->

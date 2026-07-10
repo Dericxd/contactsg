@@ -40,14 +40,14 @@
 </div>
  -->
 
-<search-input
+<app-search-input
   placeholder="Buscar por nombre o apellido..."
   (value)="query.set($event)"
   [debounceTime]="500"
   [initialValue]="query()"
 />
 
-<staff-list
+<app-staff-list
   [person]="staffResource.value() ?? []"
   [errorMessage]="staffResource.error()"
   [isEmpty]="staffResource.value()?.length === 0"
