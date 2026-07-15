@@ -3,14 +3,15 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { AvailableLocal, LocaleService } from '../../../Services/locale.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../../utils/form-utils';
+import { User } from '../../../models/User';
 
 @Component({
   selector: 'create-page',
   imports: [
     /* LowerCasePipe, 
-    UpperCasePipe,
+    UpperCasePipe, */
     TitleCasePipe,
-    DatePipe,
+    /* DatePipe,
     JsonPipe, */
     ReactiveFormsModule,
   ],
@@ -51,11 +52,15 @@ export class CreatePage {
   private fb = inject(FormBuilder);
   formUtils = FormUtils
 
+  user = new User(); 
+
   myForm: FormGroup = this.fb.group({
     //? property: [initialValue, [validators], [asyncValidators]]
     name: ['', [Validators.required, Validators.minLength(3)]],
-    price: [0, [Validators.required, Validators.min(10)]],
-    inStorage: [0, [Validators.required, Validators.min(0)]],
+    last_name: ['', [Validators.required, Validators.min(3)]],
+    position: ['', [Validators.required, Validators.min(0)]],
+    department: [0, [Validators.required]],
+    place: [0, [Validators.required]],
   });
 
   onSave() {

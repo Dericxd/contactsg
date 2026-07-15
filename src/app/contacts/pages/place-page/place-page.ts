@@ -72,13 +72,9 @@ export class PlacePage {
     return users.filter(user => {
       const name = (user.name ?? '').toString().toLowerCase();
       const lastName = (user.last_name ?? '').toString().toLowerCase();
-      const ceco = (user.ceco ?? '').toString().toLowerCase();
-      const card = (user.card ?? '').toString().toLowerCase();
 
       return name.includes(searchTerm) ||
-             lastName.includes(searchTerm) ||
-             ceco.includes(searchTerm) ||
-             card.includes(searchTerm);
+             lastName.includes(searchTerm)
     });
   });
 }

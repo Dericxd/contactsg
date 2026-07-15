@@ -19,7 +19,7 @@
           <th>Nombre Completo</th>
           <th>Ficha</th>
           <th>C.I.</th>
-          <th>CECO</th>
+          <th></th>
           <th>Fecha Ingreso</th>
         </tr>
       </thead>
@@ -28,9 +28,9 @@
           <tr>
             <td>{{ user.id }}</td>
             <td>{{ user.name }} {{ user.last_name }}</td>
-            <td>{{ user.card }}</td>
+            <td>{{ user. }}</td>
             <td>{{ user.ci }}</td>
-            <td>{{ user.ceco }}</td>
+            <td>{{ user. }}</td>
             <td>{{ user.date_in }}</td>
           </tr>
         }
@@ -48,7 +48,7 @@
       <th>Nombre Completo</th>
       <th>Ficha</th>
       <th>C.I.</th>
-      <th>CECO</th>
+      <th>Cargo</th>
       <th>Fecha Ingreso</th>
     </tr>
   </thead>
@@ -57,9 +57,7 @@
       <tr>
         <td>{{ user.id }}</td>
         <td>{{ user.name }} {{ user.last_name }}</td>
-        <td>{{ user.card }}</td>
         <td>{{ user.ci }}</td>
-        <td>{{ user.ceco }}</td>
         <td>{{ user.date_in }}</td>
       </tr>
     }
