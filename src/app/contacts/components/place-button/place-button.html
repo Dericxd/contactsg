@@ -1,0 +1,11 @@
+<div class="flex flex-auto row-auto justify-center gap-2 flex-wrap">
+  @for (place of  places; track place) {
+    <button
+      class="btn btn-outline m-2 w-[100px]"
+      (click)="selectPlace(place)"
+      [class.btn-secondary]="place === selectedPlace()"
+    >
+      {{ place }}
+    </button>
+  }
+</div>

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, delay, map, Observable, of, tap, throwError } from 'rxjs';
 import { User } from '../models/User';
+import { Place } from '../interface/place-interface';
 
 const apiUrl = 'http://localhost:3000/contacts';
 
@@ -12,6 +13,7 @@ export class UsersService {
 
   private readonly http = inject(HttpClient);
   private queryCacheUser = new Map<string, User[]>();
+  private queryCachePlace = new Map<string, User[]>();
 
   //? los usuarios
   getUsers(): Observable<User[]> {
@@ -56,6 +58,27 @@ export class UsersService {
           );
         })
       );
+  }
+
+  //? buscar usurio por lugar 
+  searchByPlace(place: Place): Observable<User[]> {
+    const url = `${ apiUrl }/places/${place}`;
+
+    if (this.queryCachePlace.has(place)) {
+      return of(this.queryCachePlace.get(place) ?? [])
+    }
+
+    return this.http.get<User[]>(url).pipe(
+      map((res: User[]) => res),
+      tap((users) => this.queryCachePlace.set(place,users)),
+      delay(2500),
+      catchError((error) => {
+        console.log(error);
+        return throwError(
+          () => Error (`No se encontro ningun usuario en: ${place}`)
+        );
+      })
+    )
   }
 }
 

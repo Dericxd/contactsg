@@ -1,4 +1,184 @@
+<h1>Crear Contacto</h1>
 <section>
-  <h1>Crear Contacto</h1>
   <p>Bienvenido a la página de creación de contactos.</p>
 </section>
+<!-- para los pipe a utilziar o reutilizar -->
+<!--
+<section class="mx-5">
+  <h1 class="text-3xl font-bold">Pipes B&aacute;sicos</h1>
+  <h3 class="text-xl font-thin">Pipes incluidos en Angular</h3>
+</section>
+
+<div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+  <div class="stat">
+    <div class="stat-figure text-neutral">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="28"
+        height="28"
+        viewBox="0 0 16 16"
+      >
+        <path
+          fill="currentColor"
+          fill-rule="evenodd"
+          d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5M8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6"
+        />
+      </svg>
+    </div>
+    <div class="stat-title">Lowercase Pipe</div>
+    <div class="stat-value">{{ nameUpper() | lowercase }}</div>
+    <div class="stat-desc">{{ nameUpper() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-figure text-neutral">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="28"
+        height="28"
+        viewBox="0 0 16 16"
+      >
+        <path
+          fill="currentColor"
+          fill-rule="evenodd"
+          d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5m-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5"
+        />
+      </svg>
+    </div>
+    <div class="stat-title">Uppercase Pipe</div>
+    <div class="stat-value">{{ nameLower() | uppercase }}</div>
+    <div class="stat-desc">{{ nameLower() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-figure text-secondary">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="28"
+        height="28"
+        viewBox="0 0 16 16"
+      >
+        <path fill="#130c8e" d="M4 6V4h8v2H9v7H7V6z" />
+        <path fill="#ef5350" d="M4 1v1H2v12h2v1H1V1zm8 0v1h2v12h-2v1h3V1z" />
+      </svg>
+    </div>
+    <div class="stat-title">Titlecase Pipe</div>
+    <div class="stat-value">{{ fullName() | titlecase }}</div>
+    <div class="stat-desc">{{ fullName() }}</div>
+  </div>
+</div>
+<div class="divider"></div>
+
+<div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+  <div class="stat">
+    <div class="stat-title">Date Pipe</div>
+    <div class="stat-value">{{ customDate() | date }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Date | long | GMT-6</div>
+    <div class="stat-value">{{ customDate() | date : "long" : "GMT-6" }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+  <div class="stat">
+    <div class="stat-title">Date | yyyy MM</div>
+    <div class="stat-value">
+      {{ customDate() | date : "yyyy MM" }}
+    </div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Date | short | GMT-4</div>
+    <div class="stat-value">{{ customDate() | date : "short" : "GMT-4" }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+  <div class="stat">
+    <div class="stat-title">Date Pipe</div>
+    <div class="stat-value">{{ customDate() | date : "dd/MM/yyyy" }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Date | medium | GMT-6</div>
+    <div class="stat-value">{{ customDate() | date : "medium" : "GMT-6" }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+  <div class="stat">
+    <div class="stat-title">Date Pipe</div>
+    <div class="stat-value">{{ customDate() | date }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Date | fullDate | GMT-4</div>
+    <div class="stat-value">
+      {{ customDate() | date : "fullDate" : "GMT-6" }}
+    </div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+  <div class="stat">
+    <div class="stat-title">Date pipe</div>
+    <div class="stat-value">
+      {{ customDate() | date : "dd/MM/yyyy" }}
+    </div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Date Pipe</div>
+    <div class="stat-value">{{ customDate() | date : "HH:mm:ss" }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Date Pipe</div>
+    <div class="stat-value">{{ customDate() | date : "EEEE d, MMMM" }}</div>
+    <div class="stat-desc">{{ customDate() }}</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="flex flex-row gap-2">
+  <h1 class="text-2xl font-bold">
+    Locale Actual:
+    <span class="badge badge-accent">{{ currentLocale() }}</span>
+  </h1>
+
+  <button (click)="changeLocale('fr')" class="btn btn-primary">
+    passer au français
+  </button>
+  <button (click)="changeLocale('en')" class="btn btn-primary">
+    Changer to English
+  </button>
+  <button (click)="changeLocale('es')" class="btn btn-primary">
+    Cambiar a español
+  </button>
+  <button (click)="changeLocale('it')" class="btn btn-primary">
+    per cambiare in italiano
+  </button>
+</div>
+-->
+

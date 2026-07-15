@@ -1,10 +1,9 @@
 import { Component, input } from '@angular/core';
 import { User } from '../../../models/User';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-staff-list',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './staff-list.html',
 })
 export class StaffList {
