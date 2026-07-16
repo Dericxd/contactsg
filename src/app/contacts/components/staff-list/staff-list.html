@@ -1,65 +1,47 @@
-<!-- <div class="overflow-x-auto">
+<div class="overflow-x-auto">
   @if (isLoading()) {
-    <div class="flex justify-center p-4">
-      <span class="loading loading-spinner loading-lg"></span>
+    <div class="flex justify-center p-8">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
     </div>
   } @else if (errorMessage()) {
-    <div class="alert alert-error">
+    <div class="alert alert-error my-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
       <span>Error: {{ errorMessage() }}</span>
     </div>
   } @else if (isEmpty() || person().length === 0) {
-    <div class="alert alert-info">
+    <div class="alert alert-info my-4">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       <span>No se encontraron usuarios.</span>
     </div>
   } @else {
-    <table class="table table-zebra w-full">
+    <table class="table table-zebra table-md w-full">
       <thead>
         <tr>
           <th>ID</th>
           <th>Nombre Completo</th>
-          <th>Ficha</th>
-          <th>C.I.</th>
-          <th></th>
-          <th>Fecha Ingreso</th>
+          <th>Departamento</th>
+          <th>Cargo</th>
+          <th>Teléfono Local / Ext.</th>
+          <th>Teléfono Personal</th>
         </tr>
       </thead>
       <tbody>
         @for (user of person(); track user.id) {
           <tr>
-            <td>{{ user.id }}</td>
+            <td class="font-bold">{{ user.id }}</td>
             <td>{{ user.name }} {{ user.last_name }}</td>
-            <td>{{ user. }}</td>
-            <td>{{ user.ci }}</td>
-            <td>{{ user. }}</td>
-            <td>{{ user.date_in }}</td>
+            <td>{{ user.department || user.departamento || '-' }}</td>
+            <td>{{ user.position || user.cargo || user.posicion || '-' }}</td>
+            <td>
+              {{ user.local_phone || user.telefono_local || '-' }}
+              @if (user.ext || user.extension) {
+                <span class="text-xs text-base-content/60 ml-1">(Ext. {{ user.ext || user.extension }})</span>
+              }
+            </td>
+            <td>{{ user.cell_phone || user.telefono_personal || '-' }}</td>
           </tr>
         }
       </tbody>
     </table>
   }
 </div>
- -->
-
-
- <table class="table table-md mt-2 w-full">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nombre Completo</th>
-      <th>Ficha</th>
-      <th>C.I.</th>
-      <th>Cargo</th>
-      <th>Fecha Ingreso</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (user of person(); track user.id) {
-      <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.name }} {{ user.last_name }}</td>
-        <td>{{ user.ci }}</td>
-        <td>{{ user.date_in }}</td>
-      </tr>
-    }
-  </tbody>
- </table>

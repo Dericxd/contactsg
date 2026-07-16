@@ -1,146 +1,162 @@
-<h1 class="stat-value">Crear Contacto </h1>
+<div class="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-100 mt-6">
+  <div class="border-b border-gray-200 pb-4 mb-6">
+    <h1 class="text-3xl font-extrabold text-gray-800">Crear Contacto</h1>
+    <p class="text-sm text-gray-500 mt-1">Completa los campos para registrar un nuevo personal en el sistema.</p>
+  </div>
 
-<section>
-  <p>Bienvenido a la página de creación de contactos.</p>
+  <form [formGroup]="myForm" (ngSubmit)="onSave()" autocomplete="off">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Nombre -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="name">Nombre</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ingrese el nombre"
+        />
+        @if ( formUtils.isValidField(myForm, "name") ) {
+          <span class="text-xs text-red-500 mt-1 block">
+             {{ formUtils.getFieldError(myForm, "name") }}
+          </span>
+        }
+      </div>
+
+      <!-- Apellido -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="last_name">Apellido</label>
+        <input
+          type="text"
+          id="last_name"
+          formControlName="last_name"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ingrese el apellido"
+        />
+        @if ( formUtils.isValidField(myForm, "last_name") ) {
+          <span class="text-xs text-red-500 mt-1 block">
+             {{ formUtils.getFieldError(myForm, "last_name") }}
+          </span>
+        }
+      </div>
+
+      <!-- C.I. (Cédula de Identidad) -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="ci">C.I. (Documento)</label>
+        <input
+          type="text"
+          id="ci"
+          formControlName="ci"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ej: 12345678"
+        />
+        @if ( formUtils.isValidField(myForm, "ci") ) {
+          <span class="text-xs text-red-500 mt-1 block">
+             {{ formUtils.getFieldError(myForm, "ci") }}
+          </span>
+        }
+      </div>
+
+      <!-- Cargo (Position) -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="position">Cargo</label>
+        <input
+          type="text"
+          id="position"
+          formControlName="position"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ej: Analista de Sistemas"
+        />
+        @if ( formUtils.isValidField(myForm, "position") ) {
+          <span class="text-xs text-red-500 mt-1 block">
+             {{ formUtils.getFieldError(myForm, "position") }}
+          </span>
+        }
+      </div>
 
 
+      <!-- Sede (Place) -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="place">Sede (Lugar)</label>
+        <select 
+          id="place"
+          formControlName="place" 
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">-- Selecciona una sede --</option>
+          @for (pl of places(); track pl.id) {
+            <option [value]="pl.id">{{ pl.name }}</option>
+          }
+        </select>
+        @if ( formUtils.isValidField(myForm, "place") ) {
+          <span class="text-xs text-red-500 mt-1 block">
+             {{ formUtils.getFieldError(myForm, "place") }}
+          </span>
+        }
+      </div>
 
-<!-- Formulario Angular con Tailwind CSS -->
-<div class="w-full max-w-1/2 mx-auto bg-white p-8 shadow-md rounded-md">
+      <!-- Departamento (Department) -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="department">Departamento</label>
+        <select 
+          id="department"
+          formControlName="department" 
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">-- Selecciona un departamento --</option>
+          @for (dept of filteredDepartments(); track dept.id) {
+            <option [value]="dept.id">{{ dept.name }}</option>
+          }
+        </select>
+        @if ( formUtils.isValidField(myForm, "department") ) {
+          <span class="text-xs text-red-500 mt-1 block">
+             {{ formUtils.getFieldError(myForm, "department") }}
+          </span>
+        }
+      </div>
 
-  <form autocomplete="on" [formGroup]="myForm" >
+      <!-- Extensión / Teléfono Local -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="local_phone">Extensión (Teléfono Local)</label>
+        <input
+          type="text"
+          id="local_phone"
+          formControlName="local_phone"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ej: 0113 o 02124587456"
+        />
+      </div>
 
-    <!-- Nombre -->
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" formControlName="name">Nombre</label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        class="w-full px-3 py-2 border rounded-md"
-        placeholder="Ingrese su nombre"
-      />
-      @if ( formUtils.isValidField(myForm, "name") ) {
-        <span class="form-text text-danger">
-          <!-- Debe de ser de 3 letras -->
-           {{ formUtils.getFieldError(myForm, "name") }}
-        </span>
-      }
+      <!-- Teléfono Personal (Celular) -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="cell_phone">Teléfono Personal</label>
+        <input
+          type="text"
+          id="cell_phone"
+          formControlName="cell_phone"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ej: 04126963548"
+        />
+      </div>
+
     </div>
 
-    <!-- Apellido -->
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="last_name">Apellido</label>
-      <input
-        type="text"
-        id="last_name"
-        name="last_name"
-        class="w-full px-3 py-2 border rounded-md"
-        placeholder="Ingrese su apellido"
-      />
-      @if ( formUtils.isValidField(myForm, "last_name") ) {
-        <span class="form-text text-danger">
-          <!-- Debe de ser de 3 letras -->
-           {{ formUtils.getFieldError(myForm, "last_name") }}
-        </span>
-      }
-    </div>
-
-    <!-- Correo Cargo -->
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="position">Cargo</label>
-      <input
-        type="text"
-        id="position"
-        name="position"
-        class="w-full px-3 py-2 border rounded-md"
-        placeholder="Cargo"
-      />
-      @if ( formUtils.isValidField(myForm, "position") ) {
-        <span class="form-text text-danger">
-          <!-- Debe de ser de 3 letras -->
-           {{ formUtils.getFieldError(myForm, "position") }}
-        </span>
-      }
-    </div>
-
-    <!-- Correo Departamento -->
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="department">Departamento</label>
-      <select formControlName="department" class="form-control w-full px-3 py-2 border rounded-md">
-        <option value="">-- Selecciona el departmento --</option>
-        <!-- <option [value]="id">
-          {{ country.name }}
-        </option> -->
-      </select>
-      @if ( formUtils.isValidField(myForm, "department") ) {
-        <span class="form-text text-danger">
-          <!-- Debe de ser de 3 letras -->
-           {{ formUtils.getFieldError(myForm, "department") }}
-        </span>
-      }
-    </div>
-
-    <!-- Correo Sede -->
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="place">Sede</label>
-      <select formControlName="place" class="form-control w-full px-3 py-2 border rounded-md">
-        <option value="">-- Selecciona la sede --</option>
-        <!-- <option [value]="id">
-          {{ country.name }}
-        </option> -->
-      </select>
-      @if ( formUtils.isValidField(myForm, "place") ) {
-        <span class="form-text text-danger">
-          <!-- Debe de ser de 3 letras -->
-           {{ formUtils.getFieldError(myForm, "place") }}
-        </span>
-      }
-    </div>
-
-    <!-- Telefono -->
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="local_phone">Extension</label>
-      <input
-        type="text"
-        id="local_phone"
-        name="local_phone"
-        class="w-full px-3 py-2 border rounded-md"
-        placeholder=" numero tlf"
-      />
-      @if ( formUtils.isValidField(myForm, "local_phone") ) {
-        <span class="form-text text-danger">
-          <!-- Debe de ser de 3 letras -->
-           {{ formUtils.getFieldError(myForm, "local_phone") }}
-        </span>
-      }
-    </div>
-
-    <!-- Telefono personal -->
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="cell_phone">Tlf personal</label>
-      <input
-        type="text"
-        id="cell_phone"
-        name="cell_phone"
-        class="w-full px-3 py-2 border rounded-md"
-        placeholder=" numero tlf"
-      />
-      @if ( formUtils.isValidField(myForm, "cell_phone") ) {
-        <span class="form-text text-danger">
-          <!-- Debe de ser de 3 letras -->
-           {{ formUtils.getFieldError(myForm, "cell_phone") }}
-        </span>
-      }
-    </div>
-    
-
-    <!-- Botón de Envío -->
-    <div>
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar</button>
+    <!-- Botones de Envío -->
+    <div class="mt-8 flex justify-end gap-4 border-t border-gray-150 pt-4">
+      <button 
+        type="button" 
+        (click)="myForm.reset()"
+        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition"
+      >
+        Limpiar
+      </button>
+      <button 
+        type="submit" 
+        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow transition"
+      >
+        Guardar Contacto
+      </button>
     </div>
   </form>
-
 </div>
-
-</section>

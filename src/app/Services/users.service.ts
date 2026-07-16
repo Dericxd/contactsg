@@ -80,6 +80,21 @@ export class UsersService {
       })
     )
   }
+
+  //? obtener departamentos
+  getDepartments(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:3000/departments');
+  }
+
+  //? obtener lugares
+  getPlaces(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:3000/places');
+  }
+
+  //? crear contacto completo
+  createFullContact(contact: any): Observable<any> {
+    return this.http.post<any>(`${apiUrl}/create-full`, contact);
+  }
 }
 
 function UserInterface(resp: User[]): any {
