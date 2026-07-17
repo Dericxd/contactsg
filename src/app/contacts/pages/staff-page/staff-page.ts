@@ -38,6 +38,10 @@ export class StaffPage {
     } 
   })
 
+  reloadData() {
+    this.staffResource.reload();
+  }
+
  /*  onSearchInput(event: Event) {
     const inputElement = event.target as HTMLInputElement;
     this.query.set(inputElement.value);

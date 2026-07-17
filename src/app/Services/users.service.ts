@@ -95,6 +95,11 @@ export class UsersService {
   createFullContact(contact: any): Observable<any> {
     return this.http.post<any>(`${apiUrl}/create-full`, contact);
   }
+
+  //? actualizar contacto completo
+  updateFullContact(id: number, contact: any): Observable<any> {
+    return this.http.put<any>(`${apiUrl}/update-full/${id}`, contact);
+  }
 }
 
 function UserInterface(resp: User[]): any {

@@ -15,4 +15,6 @@ export class User {
   telefono_personal?: string;
   ext?: string;
   extension?: string;
+  place?: string;
+  lugar?: string;
 }

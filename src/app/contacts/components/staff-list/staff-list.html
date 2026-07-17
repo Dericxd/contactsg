@@ -23,13 +23,22 @@
           <th>Cargo</th>
           <th>Teléfono Local / Ext.</th>
           <th>Teléfono Personal</th>
+          <th class="text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
         @for (user of person(); track user.id) {
-          <tr>
+          <tr class="hover:bg-base-200/30 transition-colors duration-150">
             <td class="font-bold">{{ user.id }}</td>
-            <td>{{ user.name }} {{ user.last_name }}</td>
+            <td>
+             <!--  <button 
+                type="button" 
+                 
+                class="link link-primary font-semibold hover:underline text-left"
+              > -->
+                {{ user.name }} {{ user.last_name }}
+              <!-- </button> -->
+            </td>
             <td>{{ user.department || user.departamento || '-' }}</td>
             <td>{{ user.position || user.cargo || user.posicion || '-' }}</td>
             <td>
@@ -39,9 +48,38 @@
               }
             </td>
             <td>{{ user.cell_phone || user.telefono_personal || '-' }}</td>
+            <td class="text-right">
+              <button 
+                type="button" 
+                (click)="showUser(user)" 
+                class="btn btn-sm btn-outline btn-primary"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1 inline-block">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                Ver Info
+              </button>
+            </td>
           </tr>
         }
       </tbody>
     </table>
   }
 </div>
+
+<!-- Modal User Information -->
+<dialog *ngIf="selectedUser()" class="modal modal-open">
+  <div class="modal-box max-w-2xl bg-base-100 p-6 rounded-lg shadow-2xl relative">
+    <button (click)="closeModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    <app-user-information 
+      [user]="selectedUser()!"
+      (onSaved)="onUserSaved()"
+      (onDeleted)="onUserDeleted()"
+      (onClose)="closeModal()"
+    />
+  </div>
+  <form method="dialog" class="modal-backdrop bg-black/45">
+    <button (click)="closeModal()">close</button>
+  </form>
+</dialog>

@@ -81,4 +81,8 @@ export class PlacePage {
              department.includes(searchTerm);
     });
   });
+
+  reloadData() {
+    this.usersResource.reload();
+  }
 }

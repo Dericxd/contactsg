@@ -52,4 +52,5 @@
   [errorMessage]="staffResource.error()"
   [isEmpty]="staffResource.value()?.length === 0"
   [isLoading]="staffResource.isLoading()"
+  (onDataChanged)="reloadData()"
 />

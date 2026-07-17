@@ -27,4 +27,5 @@
   [errorMessage]="usersResource.error()"
   [isEmpty]="filteredUsers().length === 0"
   [isLoading]="usersResource.isLoading()"
+  (onDataChanged)="reloadData()"
 />
