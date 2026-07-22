@@ -83,6 +83,7 @@ export class PlacePage {
   });
 
   reloadData() {
+    this.usersServices.clearCache();
     this.usersResource.reload();
   }
 }

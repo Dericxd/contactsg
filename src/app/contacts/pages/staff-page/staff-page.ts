@@ -1,4 +1,4 @@
-import { Component, inject, linkedSignal, signal } from '@angular/core';
+import { Component, inject, linkedSignal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from '../../../Services/users.service';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -8,12 +8,11 @@ import { SearchInput } from '../../components/search-input/search-input';
 
 @Component({
   selector: 'staff-page',
+  standalone: true,
   imports: [StaffList, SearchInput],
   templateUrl: './staff-page.html',
 })
-
 export class StaffPage {
-
   UsersService = inject(UsersService);
 
   activetedRoute = inject(ActivatedRoute);
@@ -26,7 +25,7 @@ export class StaffPage {
   //? rxResource
   staffResource = rxResource({
     params: () => ({ query: this.query() }),
-    stream: ({params}) =>{
+    stream: ({params}) => {
       if (!params.query) return of([]);
 
       this.router.navigate(['/contacts/by-staff'], {
@@ -36,15 +35,10 @@ export class StaffPage {
       });
       return this.UsersService.searchUsers(params.query);
     } 
-  })
+  });
 
   reloadData() {
+    this.UsersService.clearCache();
     this.staffResource.reload();
   }
-
- /*  onSearchInput(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    this.query.set(inputElement.value);
-  } */
-
 }
