@@ -9,15 +9,14 @@ import { SearchInput } from '../../components/search-input/search-input';
 import { User } from '../../../models/User';
 
 function validateQueryParam(queryParam:string){
-
   queryParam = queryParam.toLocaleLowerCase();
 
   const validPlaces: Record<string, Place> = {
-    planta: 'Planta',
-    tcc: 'TCC'
+    planta: { id: '1', name: 'Planta', status: 1 },
+    tcc: { id: '2', name: 'TCC', status: 1 }
   }
 
-  return validPlaces[queryParam as keyof typeof validPlaces] || 'TCC';
+  return validPlaces[queryParam as keyof typeof validPlaces] || { id: '2', name: 'TCC', status: 1 };
 }
 
 @Component({
@@ -30,9 +29,9 @@ export class PlacePage {
   usersServices = inject(UsersService);
 
   public places: Place[] = [
-    'Planta',
-    'TCC'
-  ]
+    { id: '1', name: 'Planta', status: 1 },
+    { id: '2', name: 'TCC', status: 1 }
+  ];
 
   activatedRoute = inject(ActivatedRoute);
   router = inject(Router);
@@ -72,13 +71,13 @@ export class PlacePage {
     return users.filter(user => {
       const name = (user.name ?? '').toString().toLowerCase();
       const lastName = (user.last_name ?? '').toString().toLowerCase();
-      const position = (user.position ?? user.cargo ?? user.posicion ?? '').toString().toLowerCase();
-      const department = (user.department ?? user.departamento ?? '').toString().toLowerCase();
+      //const position = (user.position ?? user.cargo ?? user.posicion ?? '').toString().toLowerCase();
+      //const department = (user.department ?? user.departamento ?? '').toString().toLowerCase();
 
       return name.includes(searchTerm) ||
-             lastName.includes(searchTerm) ||
-             position.includes(searchTerm) ||
-             department.includes(searchTerm);
+             lastName.includes(searchTerm);// ||
+             //position.includes(searchTerm) ||
+             //department.includes(searchTerm);
     });
   });
 

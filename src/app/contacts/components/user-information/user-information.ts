@@ -23,6 +23,7 @@ export class UserInformation {
   isEditing = signal<boolean>(false);
   places = signal<any[]>([]);
   departments = signal<any[]>([]);
+  companyLines = signal<any[]>([]);
   selectedPlaceId = signal<number | null>(null);
   public formUtils = FormUtils;
 
@@ -34,7 +35,7 @@ export class UserInformation {
     department: [{ value: '', disabled: true }, [Validators.required]],
     place: ['', [Validators.required]],
     local_phone: [''],
-    cell_phone: [''],
+    phone_number: [''],
   });
 
   filteredDepartments = computed(() => {
@@ -52,6 +53,11 @@ export class UserInformation {
     this.usersService.getDepartments().subscribe({
       next: (data) => this.departments.set(data),
       error: (err) => console.error('Error loading departments:', err)
+    });
+
+    this.usersService.getCompanyLinesAvailable().subscribe({
+      next: (data) => this.companyLines.set(data),
+      error: (err) => console.error('Error loading company lines:', err)
     });
 
     this.myForm.get('place')?.valueChanges.subscribe((val) => {
@@ -95,8 +101,20 @@ export class UserInformation {
       ci: u.ci,
       position: u.position || u.cargo || u.posicion || '',
       local_phone: u.local_phone || u.telefono_local || '',
-      cell_phone: u.cell_phone || u.telefono_personal || '',
+      phone_number: u.line_id || '',
     });
+
+    const currentLines = this.companyLines();
+    if (u.line_id && !currentLines.find(l => l.id === u.line_id)) {
+      this.companyLines.set([
+        {
+          id: u.line_id,
+          phone_number: u.cell_phone || u.telefono_personal || 'Desconocido',
+          operator: 'Actual'
+        },
+        ...currentLines
+      ]);
+    }
 
     this.isEditing.set(true);
   }
@@ -134,7 +152,7 @@ export class UserInformation {
       ci: val.ci,
       date_in: formattedDate,
       local_phone: val.local_phone || null,
-      cell_phone: val.cell_phone || null,
+      cell_phone: val.phone_number ? Number(val.phone_number) : null,
       ext: val.local_phone || null,
       department_id: Number(val.department),
       position: val.position

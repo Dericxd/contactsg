@@ -23,6 +23,12 @@ export class FormUtils {
 
         case 'min':
           return `El valor mínimo es ${ errors['min'].min }`;
+        
+        case 'email':
+          return 'Formato de correo inválido';
+
+        case 'maxlength':
+          return `Máximo ${ errors['maxlength'].requiredLength } caracteres`;
       }
     }
 

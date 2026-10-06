@@ -26,21 +26,21 @@ export class UsersService {
     return this.http.get<User[]>(apiUrl);
   }
 
-  //? crear
+  //? crear usuario
   addUser(user: User): Observable<User> {
     return this.http.post<User>(apiUrl, user).pipe(
       tap(() => this.clearCache())
     );
   }
 
-  //? actualizar
+  //? actualizar usuario
   updateUser(id: number, user: User): Observable<User> {
     return this.http.put<User>(`${apiUrl}/${id}`, user).pipe(
       tap(() => this.clearCache())
     );
   }
 
-  //! borrar
+  //! borrar usuario
   deleteUser(id: number): Observable<User> {
     return this.http.delete<User>(`${apiUrl}/${id}`).pipe(
       tap(() => this.clearCache())
@@ -70,21 +70,23 @@ export class UsersService {
       );
   }
 
-  //? buscar usurio por lugar 
+  //? buscar usuario por lugar 
   searchByPlace(place: Place): Observable<User[]> {
-    const url = `${ apiUrl }/places/${place}`;
+    const placeName = place.name;
+    const cacheKey = placeName.toLocaleLowerCase();
+    const url = `${apiUrl}/places/${encodeURIComponent(placeName)}`;
 
-    if (this.queryCachePlace.has(place)) {
-      return of(this.queryCachePlace.get(place) ?? []);
+    if (this.queryCachePlace.has(cacheKey)) {
+      return of(this.queryCachePlace.get(cacheKey) ?? []);
     }
 
     return this.http.get<User[]>(url).pipe(
       map((res: User[]) => res),
-      tap((users) => this.queryCachePlace.set(place, users)),
+      tap((users) => this.queryCachePlace.set(cacheKey, users)),
       catchError((error) => {
         console.log(error);
         return throwError(
-          () => Error (`No se encontro ningun usuario en: ${place}`)
+          () => Error(`No se encontro ningun usuario en: ${placeName}`)
         );
       })
     );
@@ -96,8 +98,8 @@ export class UsersService {
   }
 
   //? obtener lugares
-  getPlaces(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:3000/places');
+  getPlaces(): Observable<Place[]> {
+    return this.http.get<Place[]>('http://localhost:3000/places');
   }
 
   //? crear contacto completo
@@ -112,5 +114,10 @@ export class UsersService {
     return this.http.put<any>(`${apiUrl}/update-full/${id}`, contact).pipe(
       tap(() => this.clearCache())
     );
+  }
+
+  //? obtener lineas disponibles
+  getCompanyLinesAvailable(): Observable<any[]> {
+    return this.http.get<any[]>(`${apiUrl}/company-lines/available`);
   }
 }

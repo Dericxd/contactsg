@@ -172,14 +172,15 @@
 
         <!-- Teléfono Personal -->
         <div>
-          <label class="block text-gray-700 text-sm font-semibold mb-2" for="edit-cell_phone">Teléfono Personal</label>
-          <input
-            type="text"
-            id="edit-cell_phone"
-            formControlName="cell_phone"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ej: 04125555555"
-          />
+          <label class="block text-gray-700 text-sm font-semibold mb-2" for="edit-phone_number">Teléfono Personal</label>
+          <select 
+            id="edit-phone_number"
+            formControlName="phone_number" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          >
+            <option value="">-- Selecciona una línea --</option>
+            <option *ngFor="let line of companyLines()" [value]="line.id">{{ line.phone_number }} ({{ line.operator }})</option>
+          </select>
         </div>
       </div>
 

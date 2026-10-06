@@ -1,0 +1,126 @@
+<div class="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-100 mt-6">
+  <div class="border-b border-gray-200 pb-4 mb-6">
+    <h1 class="text-3xl font-extrabold text-gray-800">Crear Contacto</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      Completa los campos para registrar un nuevo personal en el sistema.
+    </p>
+  </div>
+
+  <form [formGroup]="myForm" (ngSubmit)="onSave()" autocomplete="off">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Serial -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="serial">Serial</label>
+        <input
+          type="text"
+          id="serial"
+          formControlName="serial"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ingrese el serial"
+        />
+        @if (formUtils.isValidField(myForm, 'serial')) {
+          <span class="text-xs text-red-500 mt-1 block">
+            {{ formUtils.getFieldError(myForm, 'serial') }}
+          </span>
+        }
+      </div>
+
+      <!-- Numero del movil -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="phone_number"
+          >Numero</label
+        >
+        <input
+          type="text"
+          id="phone_number"
+          formControlName="phone_number"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ingrese el numero de teléfono"
+        />
+        @if (formUtils.isValidField(myForm, 'phone_number')) {
+          <span class="text-xs text-red-500 mt-1 block">
+            {{ formUtils.getFieldError(myForm, 'phone_number') }}
+          </span>
+        }
+      </div>
+
+    
+            <!-- Operador -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="operator"
+          >Operador</label
+        >
+        <select
+          id="operator"
+          formControlName="operator"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">-- Selecciona un operador --</option>
+          <option value="digitel">Digitel</option>
+          <option value="movilnet">Movilnet</option>
+          <option value="movistar">Movistar</option>
+        </select>
+        <span *ngIf="formUtils.isValidField(myForm, 'operator')" class="text-xs text-red-500 mt-1 block">
+          {{ formUtils.getFieldError(myForm, 'operator') }}
+        </span>
+      </div>
+
+      <!-- status -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="status"
+          >Departamento</label
+        >
+        <select
+          id="status"
+          formControlName="status"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">-- Estatus de la linea --</option>
+          <option value="disponible">Disponible</option>
+          <option value="asignada">Asignada</option>
+        </select>
+        <span *ngIf="formUtils.isValidField(myForm, 'status')" class="text-xs text-red-500 mt-1 block">
+          {{ formUtils.getFieldError(myForm, 'status') }}
+        </span>
+      </div>
+
+      <!-- status -->
+      <div>
+        <label class="block text-gray-700 text-sm font-semibold mb-2" for="active_status"
+          >Condición de la linea</label
+        >
+        <select
+          id="active_status"
+          formControlName="active_status"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">-- Estatus de la linea --</option>
+          <option value="activa">Ativa</option>
+          <option value="suspendida">Suspendida</option>
+          <option value="cortada">Cortada</option>
+        </select>
+        <span *ngIf="formUtils.isValidField(myForm, 'active_status')" class="text-xs text-red-500 mt-1 block">
+          {{ formUtils.getFieldError(myForm, 'active_status') }}
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Botones de Envío -->
+    <div class="mt-8 flex justify-end gap-4 border-t border-gray-150 pt-4">
+      <button
+        type="button"
+        (click)="myForm.reset()"
+        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition"
+      >
+        Limpiar
+      </button>
+      <button
+        type="submit"
+        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow transition"
+      >
+        Guardar Contacto
+      </button>
+    </div>
+  </form>
+</div>

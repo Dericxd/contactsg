@@ -49,15 +49,15 @@
                 {{ user.name }} {{ user.last_name }}
               <!-- </button> -->
             </td>
-            <td>{{ user.department || user.departamento || '-' }}</td>
-            <td>{{ user.position || user.cargo || user.posicion || '-' }}</td>
+            <td><!-- {{ user.department || user.departamento || '-' }} --> departamento</td>
+            <td><!-- {{ user.position || user.cargo || user.posicion || '-' }} --> posicion/cargo</td>
             <td>
-              {{ user.local_phone || user.telefono_local || '-' }}
+              <!-- {{ user.local_phone || user.telefono_local || '-' }} --> telefono local
               <!-- @if (user.ext || user.extension) {
                 <span class="text-xs text-base-content/60 ml-1">(Ext. {{ user.ext || user.extension }})</span>
               } -->
             </td>
-            <td>{{ user.cell_phone || user.telefono_personal || '-' }}</td>
+            <td><!-- {{ user.cell_phone || user.telefono_personal || '-' }} --> linea asignada </td>
             <td class="text-right">
               <button 
                 type="button" 

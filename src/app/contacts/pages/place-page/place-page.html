@@ -3,13 +3,13 @@
 
 <section class="flex flex-auto row-auto justify-center gap-2 flex-wrap">
   <div class="flex-col">
-    @for (place of places; track place) {
+    @for (place of places; track place.id) {
     <button
       class="btn btn-outline m-2 w-[100px]"
       (click)="selectPlace(place)"
-      [class.btn-secondary]="place === selectedPlace()"
+      [class.btn-secondary]="place.id === selectedPlace()?.id"
     >
-      {{ place }}
+      {{ place.name }}
     </button>
     }
   </div>

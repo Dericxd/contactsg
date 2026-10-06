@@ -15,8 +15,8 @@ export class PlaceButton {
   usersService = inject(UsersService);
 
   public places: Place[] = [
-    'Planta',
-    'TCC'
+    { id: '1', name: 'Planta', status: 1 },
+    { id: '2', name: 'TCC', status: 1 }
   ];
 
   selectedPlace = signal<Place | null>(null)
