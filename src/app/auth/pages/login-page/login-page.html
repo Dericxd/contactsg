@@ -1,0 +1,36 @@
+<div class="hero min-h-screen bg-base-200">
+  <div class="hero-content flex-col lg:flex-row-reverse">
+    <div class="text-center lg:text-left">
+      <h1 class="text-5xl font-bold">Login Admin</h1>
+      <p class="py-6">Accede para gestionar usuarios y líneas telefónicas del sistema.</p>
+    </div>
+    <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div class="card-body">
+        
+        <div *ngIf="errorMessage()" class="alert alert-error shadow-lg mb-4">
+          <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Usuario</span>
+          </label>
+          <input type="text" [(ngModel)]="username" placeholder="admin" class="input input-bordered" />
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Contraseña</span>
+          </label>
+          <input type="password" [(ngModel)]="password" placeholder="admin123" class="input input-bordered" (keyup.enter)="onLogin()" />
+        </div>
+        <div class="form-control mt-6 gap-2">
+          <button class="btn btn-primary" (click)="onLogin()">Entrar</button>
+          <button class="btn btn-ghost" (click)="goBack()">Volver a inicio</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

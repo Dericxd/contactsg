@@ -28,7 +28,7 @@ export class StaffPage {
     stream: ({params}) => {
       if (!params.query) return of([]);
 
-      this.router.navigate(['/contacts/by-staff'], {
+      this.router.navigate(['/contacts/admin/by-staff'], {
         queryParams: {
           query: params.query
         }

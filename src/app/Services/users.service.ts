@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { User } from '../models/User';
 import { Place } from '../interface/place-interface';
+import { AuthService } from '../auth/auth.service';
 
 const apiUrl = 'http://localhost:3000/contacts';
 
@@ -12,8 +13,18 @@ const apiUrl = 'http://localhost:3000/contacts';
 export class UsersService {
 
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private queryCacheUser = new Map<string, User[]>();
   private queryCachePlace = new Map<string, User[]>();
+
+  private getAuthHeaders(): { headers: HttpHeaders } {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return { headers };
+  }
 
   //? Limpiar cache en memoria
   clearCache() {
@@ -28,21 +39,21 @@ export class UsersService {
 
   //? crear usuario
   addUser(user: User): Observable<User> {
-    return this.http.post<User>(apiUrl, user).pipe(
+    return this.http.post<User>(apiUrl, user, this.getAuthHeaders()).pipe(
       tap(() => this.clearCache())
     );
   }
 
   //? actualizar usuario
   updateUser(id: number, user: User): Observable<User> {
-    return this.http.put<User>(`${apiUrl}/${id}`, user).pipe(
+    return this.http.put<User>(`${apiUrl}/${id}`, user, this.getAuthHeaders()).pipe(
       tap(() => this.clearCache())
     );
   }
 
   //! borrar usuario
   deleteUser(id: number): Observable<User> {
-    return this.http.delete<User>(`${apiUrl}/${id}`).pipe(
+    return this.http.delete<User>(`${apiUrl}/${id}`, this.getAuthHeaders()).pipe(
       tap(() => this.clearCache())
     );
   }
@@ -104,14 +115,14 @@ export class UsersService {
 
   //? crear contacto completo
   createFullContact(contact: any): Observable<any> {
-    return this.http.post<any>(`${apiUrl}/create-full`, contact).pipe(
+    return this.http.post<any>(`${apiUrl}/create-full`, contact, this.getAuthHeaders()).pipe(
       tap(() => this.clearCache())
     );
   }
 
   //? actualizar contacto completo
   updateFullContact(id: number, contact: any): Observable<any> {
-    return this.http.put<any>(`${apiUrl}/update-full/${id}`, contact).pipe(
+    return this.http.put<any>(`${apiUrl}/update-full/${id}`, contact, this.getAuthHeaders()).pipe(
       tap(() => this.clearCache())
     );
   }

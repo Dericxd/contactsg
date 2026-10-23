@@ -28,7 +28,7 @@ export class CreateCompanyLine {
   });
 
   onSave() {
-    if (this.myForm.valid) {
+    if (this.myForm.invalid) {
       this.myForm.markAllAsTouched();
       return;
     }

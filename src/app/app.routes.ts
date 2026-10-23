@@ -7,11 +7,15 @@ export const routes: Routes = [
     component: HomePage
   },
   {
+    path: 'login',
+    loadComponent: () => import('./auth/pages/login-page/login-page').then(m => m.LoginPage)
+  },
+  {
     path: 'contacts',
     loadChildren: () => import('./contacts/contacts.routes'),
   },
   {
     path: '**',
-    redirectTo: 'staff'
+    redirectTo: ''
   }
 ];

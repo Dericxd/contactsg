@@ -53,7 +53,7 @@ export class PlacePage {
       console.log({place: params.place});
       if(!params.place) return of([]);
 
-      this.router.navigate(['/contacts/by-place'],{
+      this.router.navigate(['/contacts/admin/by-place'],{
         queryParams: {
           place: params.place,
         }

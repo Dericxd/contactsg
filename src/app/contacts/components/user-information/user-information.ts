@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { User } from '../../../models/User';
 import { UsersService } from '../../../Services/users.service';
+import { AuthService } from '../../../auth/auth.service';
 import { FormUtils } from '../../../utils/form-utils';
 
 @Component({
@@ -14,6 +15,7 @@ import { FormUtils } from '../../../utils/form-utils';
 export class UserInformation {
   private readonly fb = inject(FormBuilder);
   private readonly usersService = inject(UsersService);
+  private readonly authService = inject(AuthService);
 
   user = input.required<any>();
   onSaved = output<void>();
@@ -27,15 +29,28 @@ export class UserInformation {
   selectedPlaceId = signal<number | null>(null);
   public formUtils = FormUtils;
 
+  canEdit = computed(() => this.authService.isAdminOrSupervisor());
+
+  // Available roles for selection (matching create-page)
+  roles = [
+    { id: 2, name: 'Supervisor' },
+    { id: 3, name: 'Operador' },
+    { id: 4, name: 'Consultar' }
+  ];
+
   myForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     last_name: ['', [Validators.required, Validators.minLength(3)]],
     ci: ['', [Validators.required, Validators.minLength(5)]],
-    position: ['', [Validators.required, Validators.minLength(3)]],
+    position: ['', [Validators.minLength(3)]],
     department: [{ value: '', disabled: true }, [Validators.required]],
     place: ['', [Validators.required]],
     local_phone: [''],
     phone_number: [''],
+    email: ['', [Validators.email]],
+    username: ['', [Validators.minLength(3)]],
+    password: ['', [Validators.minLength(4)]],
+    role: ['']
   });
 
   filteredDepartments = computed(() => {
@@ -75,6 +90,8 @@ export class UserInformation {
   }
 
   enterEditMode() {
+    if (!this.canEdit()) return;
+
     const u = this.user();
     const matchedDept = this.departments().find(
       (d) => d.name === u.department || d.name === u.departamento
@@ -98,10 +115,14 @@ export class UserInformation {
     this.myForm.patchValue({
       name: u.name,
       last_name: u.last_name,
-      ci: u.ci,
+      ci: u.ci || (u.document_type ? (u.document_type + u.document_number) : ''),
       position: u.position || u.cargo || u.posicion || '',
       local_phone: u.local_phone || u.telefono_local || '',
       phone_number: u.line_id || '',
+      email: u.email || '',
+      username: u.username || '',
+      password: '',
+      role: u.role_id || ''
     });
 
     const currentLines = this.companyLines();
@@ -146,7 +167,7 @@ export class UserInformation {
       }
     }
 
-    const updatePayload = {
+    const updatePayload: any = {
       name: val.name,
       last_name: val.last_name,
       ci: val.ci,
@@ -155,8 +176,15 @@ export class UserInformation {
       cell_phone: val.phone_number ? Number(val.phone_number) : null,
       ext: val.local_phone || null,
       department_id: Number(val.department),
-      position: val.position
+      position: val.position,
+      email: val.email || null,
+      username: val.username || null,
+      role_id: val.role ? Number(val.role) : null
     };
+
+    if (val.password && val.password.trim() !== '') {
+      updatePayload.password = val.password;
+    }
 
     const id = this.user().id!;
     this.usersService.updateFullContact(id, updatePayload).subscribe({

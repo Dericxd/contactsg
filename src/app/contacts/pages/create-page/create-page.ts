@@ -32,6 +32,13 @@ export class CreatePage implements OnInit {
   // Selected place tracking signal
   selectedPlaceId = signal<number | null>(null);
 
+  // Roles excluyendo ID 1 (Admin)
+  roles = [
+    { id: 2, name: 'Supervisor' },
+    { id: 3, name: 'Operador' },
+    { id: 4, name: 'Consulta' }
+  ];
+
   myForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     last_name: ['', [Validators.required, Validators.minLength(3)]],
@@ -40,9 +47,10 @@ export class CreatePage implements OnInit {
     password: ['', [Validators.minLength(4)]],
     document_type: ['V', [Validators.required]],
     document_number: ['', [Validators.required, Validators.minLength(5)]],
-    position: ['', [Validators.required, Validators.minLength(3)]],
+    position: ['', [Validators.minLength(3)]],
     department: [{ value: '', disabled: true }, [Validators.required]],
     place: ['', [Validators.required]],
+    role: ['', [Validators.required]],
     local_phone: [''],
     phone_number: [''],
   });
@@ -100,6 +108,14 @@ export class CreatePage implements OnInit {
   onSave() {
     if (this.myForm.invalid) {
       this.myForm.markAllAsTouched();
+      console.log('Form is invalid. Form values:', this.myForm.value);
+      // Log errors of each control for easier debugging
+      Object.keys(this.myForm.controls).forEach(key => {
+        const controlErrors = this.myForm.get(key)?.errors;
+        if (controlErrors != null) {
+          console.log(`Key control: ${key}, key errors:`, controlErrors);
+        }
+      });
       return;
     }
 
@@ -117,7 +133,8 @@ export class CreatePage implements OnInit {
       cell_phone: val.phone_number ? Number(val.phone_number) : null, // send line_id as cell_phone
       ext: val.local_phone || null, // local_phone mapped as ext (extension)
       department_id: Number(val.department),
-      position: val.position || ''
+      position: val.position || '',
+      role_id: Number(val.role)
     };
 
     this.usersService.createFullContact(newContact).subscribe({

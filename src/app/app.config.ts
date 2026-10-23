@@ -2,7 +2,8 @@ import { ApplicationConfig, Injectable, provideBrowserGlobalErrorListeners } fro
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { HttpClient, provideHttpClient, withFetch } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './auth/auth.interceptor';
 import { Observable } from 'rxjs';
 
 Injectable({
@@ -14,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     // provideHttpClient(withFetch()),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
   ]
 };
 
