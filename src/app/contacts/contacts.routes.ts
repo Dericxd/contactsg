@@ -5,6 +5,7 @@ import { CreatePage } from './pages/create-page/create-page';
 import { PlacePage } from './pages/place-page/place-page';
 import { CompanyLinePage } from './pages/companyLine-page/companyLine-page';
 import { CreateCompanyLine } from './pages/companyLine-page/create-company-line/create-company-line';
+import { DepartmentsPage } from './pages/departments-page/departments-page';
 import { authGuard } from '../auth/auth.guard';
 import { roleGuard } from '../auth/role.guard';
 import { AuthService } from '../auth/auth.service';
@@ -30,6 +31,12 @@ export const contactsRoutes: Routes = [
             component: PlacePage,
             canActivate: [roleGuard],
             data: { roles: AuthService.DIRECTORY_ROLES }
+          },
+          {
+            path: 'by-departments',
+            component: DepartmentsPage,
+            canActivate: [roleGuard],
+            data: { roles: AuthService.DEPARTMENT_ROLES }
           },
           {
             path: 'by-company-line',
@@ -65,6 +72,10 @@ export const contactsRoutes: Routes = [
       {
         path: 'by-place',
         redirectTo: 'admin/by-place'
+      },
+      {
+        path: 'by-departments',
+        redirectTo: 'admin/by-departments'
       },
       {
         path: 'by-company-line',

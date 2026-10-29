@@ -1,87 +1,93 @@
-import { Component, inject, linkedSignal, signal, computed } from '@angular/core';
+import { Component, inject, linkedSignal, signal } from '@angular/core';
 import { Place } from '../../../interface/place-interface';
 import { UsersService } from '../../../Services/users.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { StaffList } from '../../components/staff-list/staff-list';
 import { SearchInput } from '../../components/search-input/search-input';
-import { User } from '../../../models/User';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 
-function validateQueryParam(queryParam:string){
+function validateQueryParam(queryParam: string): Place {
   queryParam = queryParam.toLocaleLowerCase();
 
   const validPlaces: Record<string, Place> = {
     planta: { id: '1', name: 'Planta', status: 1 },
     tcc: { id: '2', name: 'TCC', status: 1 }
-  }
+  };
 
   return validPlaces[queryParam as keyof typeof validPlaces] || { id: '2', name: 'TCC', status: 1 };
 }
 
 @Component({
   selector: 'place-page',
-  imports: [StaffList, SearchInput],
+  standalone: true,
+  imports: [StaffList, SearchInput, PaginationComponent],
   templateUrl: './place-page.html' 
 })
 export class PlacePage {
-
   usersServices = inject(UsersService);
+  activatedRoute = inject(ActivatedRoute);
+  router = inject(Router);
 
   public places: Place[] = [
     { id: '1', name: 'Planta', status: 1 },
     { id: '2', name: 'TCC', status: 1 }
   ];
 
-  activatedRoute = inject(ActivatedRoute);
-  router = inject(Router);
-
   queryParam = this.activatedRoute.snapshot.queryParamMap.get('place') ?? '';
 
   selectedPlace = linkedSignal<Place>(() => validateQueryParam(this.queryParam));
-
   query = signal<string>('');
+  page = signal<number>(1);
+  limit = signal<number>(10);
 
-  selectPlace(place: Place) {
+  selectPlace(place: Place): void {
     this.selectedPlace.set(place);
     this.query.set('');
+    this.page.set(1);
   }
 
-  usersResource = rxResource<User[], { place: Place }>({
-    params: () => ({place: this.selectedPlace()}),
-    stream: ({params}): Observable<User[]> => {
-      console.log({place: params.place});
-      if(!params.place) return of([]);
+  onSearch(term: string): void {
+    this.query.set(term);
+    this.page.set(1);
+  }
 
-      this.router.navigate(['/contacts/admin/by-place'],{
+  onPageChange(newPage: number): void {
+    this.page.set(newPage);
+  }
+
+  onPageSizeChange(newSize: number): void {
+    this.limit.set(newSize);
+    this.page.set(1);
+  }
+
+  usersResource = rxResource({
+    params: () => ({
+      place: this.selectedPlace(),
+      page: this.page(),
+      limit: this.limit(),
+      query: this.query()
+    }),
+    stream: ({ params }) => {
+      if (!params.place) return of({ data: [], total: 0, page: 1, limit: 10, totalPages: 0 });
+
+      this.router.navigate(['/contacts/admin/by-place'], {
         queryParams: {
-          place: params.place,
+          place: params.place.name.toLowerCase(),
         }
       });
 
-      return this.usersServices.searchByPlace(params.place)
+      return this.usersServices.searchByPlacePaginated(
+        params.place,
+        params.page,
+        params.limit,
+        params.query
+      );
     }
   });
 
-  filteredUsers = computed(() => {
-    const users = this.usersResource.value() ?? [];
-    const searchTerm = this.query().toLowerCase().trim();
-    if (!searchTerm) return users;
-
-    return users.filter(user => {
-      const name = (user.name ?? '').toString().toLowerCase();
-      const lastName = (user.last_name ?? '').toString().toLowerCase();
-      //const position = (user.position ?? user.cargo ?? user.posicion ?? '').toString().toLowerCase();
-      //const department = (user.department ?? user.departamento ?? '').toString().toLowerCase();
-
-      return name.includes(searchTerm) ||
-             lastName.includes(searchTerm);// ||
-             //position.includes(searchTerm) ||
-             //department.includes(searchTerm);
-    });
-  });
-
-  reloadData() {
+  reloadData(): void {
     this.usersServices.clearCache();
     this.usersResource.reload();
   }

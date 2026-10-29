@@ -1,51 +1,70 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { CompanyLineInterface } from '../interface/company-line-interface';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
-
+import { Observable, tap } from 'rxjs';
+import { PaginatedResponse } from '../interface/pagination-interface';
 
 const apiUrl = 'http://localhost:3000/company-lines';
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class CompanyLine {
+  private readonly http = inject(HttpClient);
+  private queryCacheCompanyLine = new Map<string, CompanyLineInterface[]>();
+  private queryCachePlace = new Map<string, CompanyLineInterface[]>();
 
-    private readonly http = inject(HttpClient);
-    private queryCacheCompanyLine = new Map<string, CompanyLineInterface[]>();
-    private queryCachePlace = new Map<string, CompanyLineInterface[]>();
+  //? Limpiar cache en memoria
+  clearCache() {
+    this.queryCacheCompanyLine.clear();
+    this.queryCachePlace.clear();
+  }
 
-    //? Limpiar cache en memoria
-    clearCache() {
-      this.queryCacheCompanyLine.clear();
-      this.queryCachePlace.clear();
+  //? los company-lines con paginación desde el servidor
+  getCompanyLinesPaginated(
+    page: number = 1,
+    limit: number = 10,
+    operator?: string,
+    search?: string
+  ): Observable<PaginatedResponse<CompanyLineInterface>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    if (operator && operator.toLowerCase() !== 'todos') {
+      params = params.set('operator', operator.trim());
     }
 
-    //? los company-lines
-    getCompanyLines(): Observable<CompanyLineInterface[]> {
-      return this.http.get<CompanyLineInterface[]>(apiUrl);
+    if (search && search.trim()) {
+      params = params.set('search', search.trim());
     }
 
-    //? crear company-line
-    addCompanyLine(companyLine: CompanyLineInterface): Observable<CompanyLineInterface> {
-      return this.http.post<CompanyLineInterface>(`${apiUrl}/create-line`, companyLine).pipe(
-        tap(() => this.clearCache())
-      );
-    }
+    return this.http.get<PaginatedResponse<CompanyLineInterface>>(apiUrl, { params });
+  }
 
-    //? actualizar company-line
-    updateCompanyLine(id: number, companyLine: CompanyLineInterface): Observable<CompanyLineInterface> {
-      return this.http.put<CompanyLineInterface>(`${apiUrl}/${id}`, companyLine).pipe(
-        tap(() => this.clearCache())
-      );
-    }
+  //? los company-lines sin paginar (compatibilidad)
+  getCompanyLines(): Observable<CompanyLineInterface[]> {
+    return this.http.get<CompanyLineInterface[]>(apiUrl);
+  }
 
-    //! borrar company-line
-    deleteCompanyLine(id: number): Observable<CompanyLineInterface> {
-      return this.http.delete<CompanyLineInterface>(`${apiUrl}/${id}`).pipe(
-        tap(() => this.clearCache())
-      );
-    }
+  //? crear company-line
+  addCompanyLine(companyLine: CompanyLineInterface): Observable<CompanyLineInterface> {
+    return this.http.post<CompanyLineInterface>(`${apiUrl}/create-line`, companyLine).pipe(
+      tap(() => this.clearCache())
+    );
+  }
 
+  //? actualizar company-line
+  updateCompanyLine(id: number, companyLine: CompanyLineInterface): Observable<CompanyLineInterface> {
+    return this.http.put<CompanyLineInterface>(`${apiUrl}/${id}`, companyLine).pipe(
+      tap(() => this.clearCache())
+    );
+  }
+
+  //! borrar company-line
+  deleteCompanyLine(id: number): Observable<CompanyLineInterface> {
+    return this.http.delete<CompanyLineInterface>(`${apiUrl}/${id}`).pipe(
+      tap(() => this.clearCache())
+    );
+  }
 }

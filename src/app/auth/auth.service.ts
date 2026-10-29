@@ -60,6 +60,8 @@ export class AuthService {
   static readonly COMPANY_LINE_ROLES = [1, 2, 3];
   // Roles con acceso a Nuevo usuario y Crear línea
   static readonly MANAGE_ROLES = [1, 2, 3];
+  // Roles con acceso a Departamentos
+  static readonly DEPARTMENT_ROLES = [1, 2, 3];
 
   canViewDirectory(): boolean {
     return this.hasRole(AuthService.DIRECTORY_ROLES);
@@ -67,6 +69,10 @@ export class AuthService {
 
   canViewCompanyLines(): boolean {
     return this.hasRole(AuthService.COMPANY_LINE_ROLES);
+  }
+
+  canViewDepartments(): boolean {
+    return this.hasRole(AuthService.DEPARTMENT_ROLES);
   }
 
   canManage(): boolean {

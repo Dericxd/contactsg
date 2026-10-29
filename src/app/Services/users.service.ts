@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { User } from '../models/User';
 import { Place } from '../interface/place-interface';
 import { AuthService } from '../auth/auth.service';
+import { PaginatedResponse } from '../interface/pagination-interface';
 
 const apiUrl = 'http://localhost:3000/contacts';
 
@@ -99,6 +100,27 @@ export class UsersService {
         return throwError(
           () => Error(`No se encontro ningun usuario en: ${placeName}`)
         );
+      })
+    );
+  }
+
+  //? buscar usuario por lugar con paginación desde el servidor
+  searchByPlacePaginated(place: Place, page: number = 1, limit: number = 10, search?: string): Observable<PaginatedResponse<User>> {
+    const placeName = place.name;
+    const url = `${apiUrl}/places/${encodeURIComponent(placeName)}`;
+
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    if (search && search.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    return this.http.get<PaginatedResponse<User>>(url, { params }).pipe(
+      catchError((error) => {
+        console.error('Error buscando personal por lugar:', error);
+        return throwError(() => new Error(`No se encontró personal en: ${placeName}`));
       })
     );
   }

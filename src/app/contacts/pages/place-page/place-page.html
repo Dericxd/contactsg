@@ -1,31 +1,44 @@
-<h1 class="text-2xl">Por lugar</h1>
-<h3 class="text-lg">Seleccione una...</h3>
+<h1 class="text-2xl font-bold">Por lugar</h1>
+<h3 class="text-sm text-base-content/60 mb-2">Seleccione una sede para consultar el personal</h3>
 
-<section class="flex flex-auto row-auto justify-center gap-2 flex-wrap">
+<section class="flex flex-auto row-auto justify-center gap-2 flex-wrap mb-4">
   <div class="flex-col">
     @for (place of places; track place.id) {
-    <button
-      class="btn btn-outline m-2 w-[100px]"
-      (click)="selectPlace(place)"
-      [class.btn-secondary]="place.id === selectedPlace()?.id"
-    >
-      {{ place.name }}
-    </button>
+      <button
+        class="btn btn-outline m-2 w-[100px]"
+        (click)="selectPlace(place)"
+        [class.btn-secondary]="place.id === selectedPlace()?.id"
+      >
+        {{ place.name }}
+      </button>
     }
   </div>
 </section>
 
 <app-search-input
-  placeholder="Buscar por departamento (Cargo), nombre o ficha..."
-  (value)="query.set($event)"
+  placeholder="Buscar por departamento (Cargo), nombre o teléfono..."
+  (value)="onSearch($event)"
   [debounceTime]="300"
   [initialValue]="query()"
 />
 
-<app-staff-list
-  [person]="filteredUsers()"
-  [errorMessage]="usersResource.error()"
-  [isEmpty]="filteredUsers().length === 0"
-  [isLoading]="usersResource.isLoading()"
-  (onDataChanged)="reloadData()"
-/>
+<div class="bg-base-100 rounded-box shadow-sm border border-base-200 mt-4 overflow-hidden">
+  <app-staff-list
+    [person]="usersResource.value()?.data ?? []"
+    [errorMessage]="usersResource.error()"
+    [isEmpty]="(usersResource.value()?.data ?? []).length === 0"
+    [isLoading]="usersResource.isLoading()"
+    (onDataChanged)="reloadData()"
+  />
+
+  @if (!usersResource.isLoading() && !usersResource.error()) {
+    <app-pagination
+      [currentPage]="page()"
+      [totalPages]="usersResource.value()?.totalPages ?? 1"
+      [totalItems]="usersResource.value()?.total ?? 0"
+      [pageSize]="limit()"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    />
+  }
+</div>
