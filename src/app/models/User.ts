@@ -9,6 +9,8 @@ export class User {
   password?: string;
   date_in?: Date;
   status?: string;
+  deleted_at?: string | Date | null;
+  role_id?: number | null;
 
   // Additional properties from JOIN queries
   usuario_nombre?: string;

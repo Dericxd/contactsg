@@ -52,34 +52,47 @@ export class UsersService {
     );
   }
 
-  //! borrar usuario
+  //! borrar usuario (soft delete)
   deleteUser(id: number): Observable<User> {
     return this.http.delete<User>(`${apiUrl}/${id}`, this.getAuthHeaders()).pipe(
       tap(() => this.clearCache())
     );
   }
 
-  //? buscar usuarios por query
-  searchUsers(query: string): Observable<User[]> {
-    query = query.toLocaleLowerCase(); 
+  //? restaurar usuario eliminado (soft delete reverse)
+  restoreUser(id: number): Observable<any> {
+    return this.http.post<any>(`${apiUrl}/restore/${id}`, {}, this.getAuthHeaders()).pipe(
+      tap(() => this.clearCache())
+    );
+  }
 
-    if (this.queryCacheUser.has(query)) {
-      return of(this.queryCacheUser.get(query) ?? []);
+  //? buscar usuarios por query
+  searchUsers(query: string, includeDeleted: boolean = false): Observable<User[]> {
+    query = query.toLocaleLowerCase(); 
+    const cacheKey = `${query}_del_${includeDeleted}`;
+
+    if (this.queryCacheUser.has(cacheKey)) {
+      return of(this.queryCacheUser.get(cacheKey) ?? []);
     }
 
-    console.log('Searching users with query:', query);
+    let params = new HttpParams();
+    if (includeDeleted) {
+      params = params.set('include_deleted', 'true');
+    }
 
-    return this.http.get<User[]>(`${apiUrl}/staff/search/${ query }`)
-      .pipe(
-        map((resp: User[]) => resp),
-        tap((users) => this.queryCacheUser.set(query, users)),
-        catchError((error) => {
-          console.error('Error searching users:', error);
-          return throwError(
-            () => new Error('Error searching users')
-          );
-        })
-      );
+    return this.http.get<User[]>(`${apiUrl}/staff/search/${encodeURIComponent(query)}`, {
+      ...this.getAuthHeaders(),
+      params
+    }).pipe(
+      map((resp: User[]) => resp),
+      tap((users) => this.queryCacheUser.set(cacheKey, users)),
+      catchError((error) => {
+        console.error('Error searching users:', error);
+        return throwError(
+          () => new Error('Error searching users')
+        );
+      })
+    );
   }
 
   //? buscar usuario por lugar 
@@ -92,7 +105,7 @@ export class UsersService {
       return of(this.queryCachePlace.get(cacheKey) ?? []);
     }
 
-    return this.http.get<User[]>(url).pipe(
+    return this.http.get<User[]>(url, this.getAuthHeaders()).pipe(
       map((res: User[]) => res),
       tap((users) => this.queryCachePlace.set(cacheKey, users)),
       catchError((error) => {
@@ -117,7 +130,10 @@ export class UsersService {
       params = params.set('search', search.trim());
     }
 
-    return this.http.get<PaginatedResponse<User>>(url, { params }).pipe(
+    return this.http.get<PaginatedResponse<User>>(url, {
+      ...this.getAuthHeaders(),
+      params
+    }).pipe(
       catchError((error) => {
         console.error('Error buscando personal por lugar:', error);
         return throwError(() => new Error(`No se encontró personal en: ${placeName}`));
@@ -151,6 +167,6 @@ export class UsersService {
 
   //? obtener lineas disponibles
   getCompanyLinesAvailable(): Observable<any[]> {
-    return this.http.get<any[]>(`${apiUrl}/company-lines/available`);
+    return this.http.get<any[]>(`${apiUrl}/company-lines/available`, this.getAuthHeaders());
   }
 }

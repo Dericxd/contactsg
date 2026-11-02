@@ -179,8 +179,8 @@
         </span>
       </div>
 
-      <!-- Rol de Sistema -->
-      <div>
+      <!-- Rol de Sistema (solo visible si tiene permiso de asignar rol) -->
+      <div *ngIf="canAssignRole()">
         <label class="block text-gray-700 text-sm font-semibold mb-2" for="role"
           >Rol del Sistema</label
         >

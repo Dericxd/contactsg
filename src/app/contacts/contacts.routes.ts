@@ -7,15 +7,14 @@ import { CompanyLinePage } from './pages/companyLine-page/companyLine-page';
 import { CreateCompanyLine } from './pages/companyLine-page/create-company-line/create-company-line';
 import { DepartmentsPage } from './pages/departments-page/departments-page';
 import { authGuard } from '../auth/auth.guard';
-import { roleGuard } from '../auth/role.guard';
-import { AuthService } from '../auth/auth.service';
+import { permissionGuard, adminGuard } from '../auth/permission.guard';
 
 export const contactsRoutes: Routes = [
   {
     path: '',
     component: GeniacareLayout,
     children: [
-      // ====== Rutas protegidas (login + rol) ======
+      // ====== Rutas protegidas por permisos ======
       {
         path: 'admin',
         canActivate: [authGuard],
@@ -23,38 +22,43 @@ export const contactsRoutes: Routes = [
           {
             path: 'by-staff',
             component: StaffPage,
-            canActivate: [roleGuard],
-            data: { roles: AuthService.DIRECTORY_ROLES }
+            canActivate: [permissionGuard],
+            data: { permissions: ['agenda.view'] }
           },
           {
             path: 'by-place',
             component: PlacePage,
-            canActivate: [roleGuard],
-            data: { roles: AuthService.DIRECTORY_ROLES }
+            canActivate: [permissionGuard],
+            data: { permissions: ['agenda.by-place', 'agenda.view'] }
           },
           {
             path: 'by-departments',
             component: DepartmentsPage,
-            canActivate: [roleGuard],
-            data: { roles: AuthService.DEPARTMENT_ROLES }
+            canActivate: [permissionGuard],
+            data: { permissions: ['departments.view'] }
           },
           {
             path: 'by-company-line',
             component: CompanyLinePage,
-            canActivate: [roleGuard],
-            data: { roles: AuthService.COMPANY_LINE_ROLES }
+            canActivate: [permissionGuard],
+            data: { permissions: ['phone-lines.view'] }
           },
           {
             path: 'by-create',
             component: CreatePage,
-            canActivate: [roleGuard],
-            data: { roles: AuthService.MANAGE_ROLES }
+            canActivate: [permissionGuard],
+            data: { permissions: ['employees.create'] }
           },
           {
             path: 'by-create-line',
             component: CreateCompanyLine,
-            canActivate: [roleGuard],
-            data: { roles: AuthService.MANAGE_ROLES }
+            canActivate: [permissionGuard],
+            data: { permissions: ['phone-lines.create'] }
+          },
+          {
+            path: 'permissions',
+            canActivate: [adminGuard],
+            loadComponent: () => import('./pages/permissions-page/permissions-page').then(m => m.PermissionsPage)
           },
           {
             path: '',
@@ -82,7 +86,7 @@ export const contactsRoutes: Routes = [
         redirectTo: 'admin/by-company-line'
       },
 
-      // ====== Redirect ======
+      // ====== Redirect por defecto ======
       {
         path: '**',
         redirectTo: 'admin/by-staff'

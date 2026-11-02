@@ -84,7 +84,7 @@
           <th>Estatus</th>
           <th>Condición</th>
           <th>Serial</th>
-          <th *ngIf="authService.canViewCompanyLines()" class="text-right">Acciones</th>
+          <th *ngIf="authService.canManage()" class="text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -134,7 +134,7 @@
             <td class="font-mono text-xs text-base-content/60">
               {{ line.serial || '-' }}
             </td>
-            <td *ngIf="authService.canViewCompanyLines()" class="text-right">
+            <td *ngIf="authService.canManage()" class="text-right">
               <button
                 type="button"
                 (click)="openEditModal(line)"

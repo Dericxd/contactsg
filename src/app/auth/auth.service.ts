@@ -1,29 +1,33 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, switchMap } from 'rxjs/operators';
+import { PermissionService } from '../Services/permission.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private permissionService = inject(PermissionService);
   private apiUrl = 'http://localhost:3000/api/auth/login';
 
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(this.apiUrl, { username, password }).pipe(
-      tap(response => {
+      tap((response) => {
         if (response && response.token) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
         }
-      })
+      }),
+      switchMap(() => this.permissionService.load())
     );
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    this.permissionService.clear();
   }
 
   isAuthenticated(): boolean {
@@ -48,38 +52,48 @@ export class AuthService {
     return null;
   }
 
-  hasRole(allowedRoles: number[]): boolean {
-    const role = this.getUserRole();
-    return role !== null && allowedRoles.includes(role);
-  }
-
-  // Roles: 1 Administrador, 2 Supervisor, 3 Operador, 4 Consulta
-  // Roles con acceso a Usuarios (trabajadores) y Lugar (ubicación)
-  static readonly DIRECTORY_ROLES = [1, 2, 3, 4];
-  // Roles con acceso a Línea de compañía
-  static readonly COMPANY_LINE_ROLES = [1, 2, 3];
-  // Roles con acceso a Nuevo usuario y Crear línea
-  static readonly MANAGE_ROLES = [1, 2, 3];
-  // Roles con acceso a Departamentos
-  static readonly DEPARTMENT_ROLES = [1, 2, 3];
-
+  // Delegaciones hacia PermissionService para comprobaciones reactivas
   canViewDirectory(): boolean {
-    return this.hasRole(AuthService.DIRECTORY_ROLES);
+    return this.permissionService.hasAny(['agenda.view', 'agenda.by-place']);
   }
 
   canViewCompanyLines(): boolean {
-    return this.hasRole(AuthService.COMPANY_LINE_ROLES);
+    return this.permissionService.has('phone-lines.view');
   }
 
   canViewDepartments(): boolean {
-    return this.hasRole(AuthService.DEPARTMENT_ROLES);
+    return this.permissionService.has('departments.view');
   }
 
   canManage(): boolean {
-    return this.hasRole(AuthService.MANAGE_ROLES);
+    return this.permissionService.hasAny(['employees.create', 'phone-lines.create']);
+  }
+
+  canCreateStaff(): boolean {
+    return this.permissionService.has('employees.create');
+  }
+
+  canEditStaff(): boolean {
+    return this.permissionService.has('employees.update');
+  }
+
+  canDeleteStaff(): boolean {
+    return this.permissionService.has('employees.delete');
+  }
+
+  canAssignRole(): boolean {
+    return this.permissionService.has('employees.assign-role');
+  }
+
+  canRestoreStaff(): boolean {
+    return this.permissionService.has('employees.restore');
+  }
+
+  isAdmin(): boolean {
+    return this.permissionService.isAdmin();
   }
 
   isAdminOrSupervisor(): boolean {
-    return this.hasRole([1, 2]);
+    return this.permissionService.isAdmin() || this.permissionService.has('employees.delete');
   }
 }

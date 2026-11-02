@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../../utils/form-utils';
 import { UsersService } from '../../../Services/users.service';
+import { AuthService } from '../../../auth/auth.service';
 
 import { CommonModule } from '@angular/common';
 import { Place } from '../../../interface/place-interface';
@@ -21,8 +22,11 @@ export class CreatePage implements OnInit {
   
   private fb = inject(FormBuilder);
   private usersService = inject(UsersService);
+  private authService = inject(AuthService);
   
   formUtils = FormUtils;
+
+  canAssignRole = computed(() => this.authService.canAssignRole());
 
   // Signals to hold raw database lists
   places = signal<Place[]>([]);
@@ -50,36 +54,33 @@ export class CreatePage implements OnInit {
     position: ['', [Validators.minLength(3)]],
     department: [{ value: '', disabled: true }, [Validators.required]],
     place: ['', [Validators.required]],
-    role: ['', [Validators.required]],
+    role: [''],
     local_phone: [''],
     phone_number: [''],
   });
 
   ngOnInit() {
-    console.log('CreatePage ngOnInit initialized');
-    
+    // Si puede asignar roles, hacerlo requerido; si no (ej. Operador), se asignará Consulta automáticamente
+    if (this.canAssignRole()) {
+      this.myForm.get('role')?.setValidators([Validators.required]);
+    } else {
+      this.myForm.get('role')?.clearValidators();
+    }
+    this.myForm.get('role')?.updateValueAndValidity();
+
     // 1. Fetch places and departments
     this.usersService.getPlaces().subscribe({
-      next: (data) => {
-        //console.log('Places fetched successfully:', data);
-        this.places.set(data);
-      },
+      next: (data) => this.places.set(data),
       error: (err) => console.error('Error loading places:', err)
     });
 
     this.usersService.getDepartments().subscribe({
-      next: (data) => {
-        //console.log('Departments fetched successfully:', data);
-        this.departments.set(data);
-      },
+      next: (data) => this.departments.set(data),
       error: (err) => console.error('Error loading departments:', err)
     });
 
     this.usersService.getCompanyLinesAvailable().subscribe({
-      next: (data) => {
-        //console.log('Company lines fetched successfully:', data);
-        this.companyLines.set(data);
-      },
+      next: (data) => this.companyLines.set(data),
       error: (err) => console.error('Error loading company lines:', err)
     });
 
@@ -108,19 +109,11 @@ export class CreatePage implements OnInit {
   onSave() {
     if (this.myForm.invalid) {
       this.myForm.markAllAsTouched();
-      console.log('Form is invalid. Form values:', this.myForm.value);
-      // Log errors of each control for easier debugging
-      Object.keys(this.myForm.controls).forEach(key => {
-        const controlErrors = this.myForm.get(key)?.errors;
-        if (controlErrors != null) {
-          console.log(`Key control: ${key}, key errors:`, controlErrors);
-        }
-      });
       return;
     }
 
     const val = this.myForm.value;
-    const newContact = {
+    const newContact: any = {
       name: val.name,
       last_name: val.last_name,
       document_type: val.document_type,
@@ -128,20 +121,25 @@ export class CreatePage implements OnInit {
       email: val.email || null,
       username: val.username || null,
       password: val.password || null,
-      date_in: new Date().toISOString().slice(0, 10) || null, // Current date
+      date_in: new Date().toISOString().slice(0, 10) || null,
       local_phone: val.local_phone || null,
-      cell_phone: val.phone_number ? Number(val.phone_number) : null, // send line_id as cell_phone
-      ext: val.local_phone || null, // local_phone mapped as ext (extension)
+      cell_phone: val.phone_number ? Number(val.phone_number) : null,
+      ext: val.local_phone || null,
       department_id: Number(val.department),
       position: val.position || '',
-      role_id: Number(val.role)
     };
+
+    if (this.canAssignRole() && val.role) {
+      newContact.role_id = Number(val.role);
+    }
 
     this.usersService.createFullContact(newContact).subscribe({
       next: (res) => {
-        console.log('Contact created successfully:', res);
-        alert('Contacto guardado con éxito en las tablas de users, phone_numbers y user_departments.');
-        this.myForm.reset();
+        alert('Contacto guardado con éxito.');
+        this.myForm.reset({
+          document_type: 'V',
+          role: ''
+        });
       },
       error: (err) => {
         console.error('Error creating contact:', err);

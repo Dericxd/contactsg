@@ -9,7 +9,8 @@ const LOGIN_URL = `${API_BASE}/api/auth/login`;
 
 /**
  * Agrega el token JWT a todas las peticiones hacia el backend.
- * Si el backend responde 401/403 (token vencido o inválido), cierra la sesión y envía al login.
+ * Si el backend responde 401 (token vencido o inválido), cierra la sesión y envía al login.
+ * Si responde 403 (permiso denegado), permite que el componente maneje la respuesta sin cerrar sesión.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -25,7 +26,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (isApiRequest && !isLoginRequest && (error.status === 401 || error.status === 403)) {
+      if (isApiRequest && !isLoginRequest && error.status === 401) {
         authService.logout();
         router.navigate(['/login']);
       }

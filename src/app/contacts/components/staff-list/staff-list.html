@@ -41,13 +41,12 @@
           <tr class="hover:bg-base-200/30 transition-colors duration-150">
             <td class="font-bold">{{ user.id }}</td>
             <td>
-             <!--  <button 
-                type="button" 
-                 
-                class="link link-primary font-semibold hover:underline text-left"
-              > -->
+              <span [class.line-through]="user.deleted_at" [class.opacity-60]="user.deleted_at">
                 {{ user.name }} {{ user.last_name }}
-              <!-- </button> -->
+              </span>
+              @if (user.deleted_at) {
+                <span class="badge badge-xs badge-error ml-1 text-white font-semibold">Eliminado</span>
+              }
             </td>
             <td>{{ user.department || user.departamento || '-' }}</td>
             <td>{{ user.position || user.cargo || user.posicion || '-' }}</td>

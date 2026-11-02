@@ -2,9 +2,14 @@
   <!-- View Mode -->
   <ng-container *ngIf="!isEditing()">
     <div class="flex flex-col gap-4">
-      <div class="border-b border-base-300 pb-4">
-        <h2 class="text-2xl font-bold text-primary">{{ user().name }} {{ user().last_name }}</h2>
-        <p class="text-sm text-base-content/60">C.I. {{ user().ci }}</p>
+      <div class="border-b border-base-300 pb-4 flex justify-between items-start">
+        <div>
+          <h2 class="text-2xl font-bold text-primary">{{ user().name }} {{ user().last_name }}</h2>
+          <p class="text-sm text-base-content/60">C.I. {{ user().ci }}</p>
+        </div>
+        <div *ngIf="isDeleted()">
+          <span class="badge badge-error badge-lg text-white font-bold">Eliminado (Inactivo)</span>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -23,16 +28,11 @@
           <span class="text-base font-medium">{{ user().place || user().lugar || '-' }}</span>
         </div>
 
-        <div class="flex flex-col gap-1 hidden">
-          <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">Fecha de Ingreso</span>
-          <span class="text-base font-medium">{{ user().date_in | date: 'dd/MM/yyyy' : 'UTC' }}</span>
-        </div>
-
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">Teléfono Local / Ext.</span>
           <span class="text-base font-medium">
             {{ user().local_phone || user().telefono_local || '-' }}
-            <span *ngIf="user().ext || user().extension" class="text-xs text-base-content/60 ml-1 hidden">
+            <span *ngIf="user().ext || user().extension" class="text-xs text-base-content/60 ml-1">
               (Ext. {{ user().ext || user().extension }})
             </span>
           </span>
@@ -55,15 +55,37 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-base-300">
-        <ng-container *ngIf="canEdit()">
-          <button type="button" class="btn btn-info" (click)="enterEditMode()">
-            Actualizar
-          </button>
-          <button type="button" class="btn btn-error" (click)="deleteUser()">
-            Eliminar
-          </button>
-        </ng-container>
-        <button type="button" class="btn btn-ghost" (click)="onClose.emit()">
+        <!-- Botón Actualizar -->
+        <button 
+          *ngIf="canEdit() && (!isDeleted() || canRestore())" 
+          type="button" 
+          class="btn btn-info btn-sm" 
+          (click)="enterEditMode()"
+        >
+          Actualizar
+        </button>
+
+        <!-- Botón Eliminar (soft delete) -->
+        <button 
+          *ngIf="canDelete() && !isDeleted()" 
+          type="button" 
+          class="btn btn-error btn-sm" 
+          (click)="deleteUser()"
+        >
+          Eliminar
+        </button>
+
+        <!-- Botón Restaurar (solo admin) -->
+        <button 
+          *ngIf="canRestore() && isDeleted()" 
+          type="button" 
+          class="btn btn-warning btn-sm" 
+          (click)="restoreUser()"
+        >
+          Restaurar
+        </button>
+
+        <button type="button" class="btn btn-ghost btn-sm" (click)="onClose.emit()">
           Cerrar
         </button>
       </div>
@@ -137,7 +159,7 @@
 
         <!-- Password -->
         <div>
-          <label class="block text-gray-700 text-sm font-semibold mb-2" for="edit-password">Contraseña (Dejar en blanco para no cambiar)</label>
+          <label class="block text-gray-700 text-sm font-semibold mb-2" for="edit-password">Contraseña <span class="text-xs text-gray-500">(Dejar en blanco para no cambiar)</span></label>
           <input
             type="password"
             id="edit-password"
@@ -147,8 +169,8 @@
           />
         </div>
 
-        <!-- Role -->
-        <div>
+        <!-- Role: SOLO visible si el usuario tiene permiso employees.assign-role (Admin o Supervisor) -->
+        <div *ngIf="canAssignRole()">
           <label class="block text-gray-700 text-sm font-semibold mb-2" for="edit-role">Rol en el Sistema (Opcional)</label>
           <select 
             id="edit-role"
@@ -249,10 +271,10 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-base-300">
-        <button type="submit" class="btn btn-success">
+        <button type="submit" class="btn btn-success btn-sm">
           Guardar
         </button>
-        <button type="button" class="btn btn-ghost" (click)="cancelEdit()">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">
           Cancelar
         </button>
       </div>

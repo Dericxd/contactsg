@@ -1,0 +1,261 @@
+<div class="p-4 max-w-7xl mx-auto space-y-4">
+  <!-- Encabezado de la página -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-base-300 pb-3">
+    <div>
+      <h1 class="text-2xl font-black text-primary tracking-tight flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        Permisos de Usuario
+      </h1>
+      <p class="text-xs text-base-content/70">
+        Panel de administración para conceder o revocar permisos específicos por módulo sobre los usuarios del sistema.
+      </p>
+    </div>
+  </div>
+
+  <!-- Mensajes de Alerta -->
+  @if (errorMessage()) {
+    <div class="alert alert-error shadow-sm text-sm py-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="alert alert-success shadow-sm text-sm py-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
+  <!-- Layout de dos columnas -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    
+    <!-- COLUMNA IZQUIERDA: Lista de Usuarios -->
+    <div class="lg:col-span-4 card bg-base-100 border border-base-300 shadow-sm">
+      <div class="card-body p-4 space-y-3">
+        <div class="flex justify-between items-center">
+          <h2 class="font-bold text-sm tracking-wide uppercase text-base-content/80">Usuarios del Sistema</h2>
+          <span class="badge badge-sm badge-neutral">{{ filteredUsers().length }}</span>
+        </div>
+
+        <!-- Buscador -->
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Buscar por nombre o usuario..."
+            class="input input-sm input-bordered w-full pl-8"
+            [ngModel]="searchUser()"
+            (ngModelChange)="searchUser.set($event)"
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 absolute left-2.5 top-2.5 text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <!-- Lista -->
+        <div class="overflow-y-auto max-h-[600px] space-y-1 pr-1">
+          @if (isLoadingUsers()) {
+            <div class="flex justify-center p-6">
+              <span class="loading loading-spinner text-primary"></span>
+            </div>
+          } @else if (filteredUsers().length === 0) {
+            <div class="text-center p-6 text-xs text-base-content/50">
+              No se encontraron usuarios.
+            </div>
+          } @else {
+            @for (u of filteredUsers(); track u.id) {
+              <div
+                (click)="onSelectUser(u)"
+                class="p-2.5 rounded-lg border transition-all text-left flex items-center justify-between gap-2"
+                [class.cursor-pointer]="!u.is_admin"
+                [class.cursor-not-allowed]="u.is_admin"
+                [class.bg-primary]="selectedUser()?.id === u.id"
+                [class.text-white]="selectedUser()?.id === u.id"
+                [class.border-primary]="selectedUser()?.id === u.id"
+                [class.hover:bg-base-200]="selectedUser()?.id !== u.id && !u.is_admin"
+                [class.border-base-300]="selectedUser()?.id !== u.id"
+                [class.opacity-70]="u.is_admin"
+              >
+                <div class="truncate">
+                  <p class="font-bold text-sm truncate leading-tight">{{ u.name }} {{ u.last_name }}</p>
+                  <p class="text-xs opacity-75 truncate">&#64;{{ u.username || 'sin_usuario' }}</p>
+                </div>
+
+                <div class="shrink-0 text-right">
+                  @if (u.is_admin) {
+                    <span class="badge badge-sm badge-warning font-semibold">Admin (Total)</span>
+                  } @else {
+                    <span class="badge badge-sm badge-ghost">{{ u.role_name || 'Consulta' }}</span>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: Matriz de Permisos del Usuario Seleccionado -->
+    <div class="lg:col-span-8">
+      @if (!selectedUser()) {
+        <div class="card bg-base-100 border border-base-300 shadow-sm p-12 text-center text-base-content/60 space-y-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+          <h3 class="font-bold text-lg text-base-content/80">Ningún usuario seleccionado</h3>
+          <p class="text-sm max-w-md mx-auto">
+            Selecciona un usuario de la lista de la izquierda para ver y gestionar sus permisos directos en cada módulo.
+          </p>
+        </div>
+      } @else {
+        <div class="space-y-4">
+          <!-- Barra de Cabecera y Acciones del Usuario -->
+          <div class="card bg-base-100 border border-base-300 shadow-sm">
+            <div class="card-body p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg font-black text-primary">{{ selectedUser()?.name }} {{ selectedUser()?.last_name }}</h2>
+                  <span class="badge badge-sm badge-outline font-semibold">{{ selectedUser()?.role_name || 'Consulta' }}</span>
+                </div>
+                <p class="text-xs text-base-content/60">Configuración de excepciones en tabla <code>user_permissions</code></p>
+              </div>
+
+              <!-- Botones de Acción -->
+              <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                @if (pendingChangesCount() > 0) {
+                  <span class="badge badge-warning font-semibold text-xs animate-pulse">
+                    {{ pendingChangesCount() }} pendientes
+                  </span>
+                  <button 
+                    (click)="discardChanges()" 
+                    [disabled]="isSaving()"
+                    class="btn btn-sm btn-ghost"
+                  >
+                    Descartar
+                  </button>
+                }
+                
+                <button 
+                  (click)="saveChanges()" 
+                  [disabled]="pendingChangesCount() === 0 || isSaving()"
+                  class="btn btn-sm btn-primary gap-2"
+                >
+                  @if (isSaving()) {
+                    <span class="loading loading-spinner loading-xs"></span>
+                  }
+                  <span>Guardar cambios</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Módulos y Permisos -->
+          @if (isLoadingMatrix()) {
+            <div class="card bg-base-100 border border-base-300 p-8 flex justify-center items-center">
+              <span class="loading loading-spinner loading-lg text-primary"></span>
+            </div>
+          } @else if (matrix(); as mtx) {
+            <div class="space-y-4">
+              @for (mod of mtx.modules; track mod.id) {
+                <div class="card bg-base-100 border border-base-300 shadow-sm overflow-hidden">
+                  <!-- Título del Módulo -->
+                  <div class="bg-base-200/60 px-4 py-2.5 border-b border-base-300 flex items-center justify-between">
+                    <span class="font-bold text-sm tracking-wide text-base-content flex items-center gap-2">
+                      <span class="badge badge-sm badge-primary badge-outline">{{ mod.slug }}</span>
+                      {{ mod.name }}
+                    </span>
+                    <span class="text-xs text-base-content/60">{{ mod.permissions.length }} permisos</span>
+                  </div>
+
+                  <!-- Tabla de permisos -->
+                  <div class="overflow-x-auto">
+                    <table class="table table-sm w-full">
+                      <thead>
+                        <tr class="text-xs text-base-content/60 border-b border-base-200">
+                          <th>Permiso</th>
+                          <th class="text-center">Por Rol</th>
+                          <th class="text-center">Asignación Directa</th>
+                          <th class="text-center">Efectivo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (p of mod.permissions; track p.id) {
+                          @let currentEffect = getEffect(p.id, p.user_effect);
+                          @let effectiveResult = computeEffective(p.from_role, currentEffect, p.admin_only);
+                          <tr class="hover:bg-base-200/40 border-b border-base-200">
+                            <td>
+                              <div class="font-bold text-xs text-base-content">{{ p.name }}</div>
+                              <div class="text-[11px] text-base-content/60 font-mono">{{ p.slug }}</div>
+                              @if (p.description) {
+                                <div class="text-[11px] text-base-content/50 italic">{{ p.description }}</div>
+                              }
+                            </td>
+
+                            <!-- Rol base -->
+                            <td class="text-center align-middle">
+                              @if (p.from_role) {
+                                <span class="badge badge-xs badge-info font-medium">Sí</span>
+                              } @else {
+                                <span class="badge badge-xs badge-ghost text-base-content/40">No</span>
+                              }
+                            </td>
+
+                            <!-- Selector de efecto directo -->
+                            <td class="text-center align-middle">
+                              @if (p.admin_only) {
+                                <span class="badge badge-xs badge-warning font-semibold">Exclusivo Admin</span>
+                              } @else {
+                                <select 
+                                  [value]="currentEffect"
+                                  (change)="setEffect(p.id, p.user_effect, $any($event.target).value === '' ? null : $any($event.target).value)"
+                                  class="select select-bordered select-xs text-xs font-medium"
+                                  [class.border-success]="currentEffect === 'grant'"
+                                  [class.border-error]="currentEffect === 'revoke'"
+                                  [class.border-warning]="pendingChanges().has(p.id)"
+                                >
+                                  <option [value]="null">Según rol</option>
+                                  <option value="grant">Conceder (Grant)</option>
+                                  <option value="revoke">Revocar (Revoke)</option>
+                                </select>
+                              }
+                            </td>
+
+                            <!-- Efectivo -->
+                            <td class="text-center align-middle">
+                              @if (effectiveResult) {
+                                <span class="badge badge-xs badge-success text-white font-bold gap-1">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                  </svg>
+                                  Permitido
+                                </span>
+                              } @else {
+                                <span class="badge badge-xs badge-error text-white font-bold gap-1">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                  </svg>
+                                  Denegado
+                                </span>
+                              }
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

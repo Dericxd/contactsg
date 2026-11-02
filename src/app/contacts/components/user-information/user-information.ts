@@ -29,13 +29,18 @@ export class UserInformation {
   selectedPlaceId = signal<number | null>(null);
   public formUtils = FormUtils;
 
-  canEdit = computed(() => this.authService.isAdminOrSupervisor());
+  // Permisos reactivos
+  canEdit = computed(() => this.authService.canEditStaff());
+  canDelete = computed(() => this.authService.canDeleteStaff());
+  canAssignRole = computed(() => this.authService.canAssignRole());
+  canRestore = computed(() => this.authService.canRestoreStaff());
+  isDeleted = computed(() => !!this.user()?.deleted_at);
 
   // Available roles for selection (matching create-page)
   roles = [
     { id: 2, name: 'Supervisor' },
     { id: 3, name: 'Operador' },
-    { id: 4, name: 'Consultar' }
+    { id: 4, name: 'Consulta' }
   ];
 
   myForm: FormGroup = this.fb.group({
@@ -108,7 +113,6 @@ export class UserInformation {
       deptControl?.disable({ emitEvent: false });
     }
 
-    // Disable event emission temporarily to prevent clearing the department control
     this.myForm.get('place')?.setValue(placeId || '', { emitEvent: false });
     this.myForm.get('department')?.setValue(deptId || '', { emitEvent: false });
 
@@ -146,13 +150,6 @@ export class UserInformation {
 
   saveUpdate() {
     if (this.myForm.invalid) {
-      console.warn('Form validation failed:');
-      Object.keys(this.myForm.controls).forEach(key => {
-        const controlErrors = this.myForm.get(key)?.errors;
-        if (controlErrors != null) {
-          console.warn(`Control "${key}" has errors:`, controlErrors);
-        }
-      });
       this.myForm.markAllAsTouched();
       return;
     }
@@ -174,13 +171,16 @@ export class UserInformation {
       date_in: formattedDate,
       local_phone: val.local_phone || null,
       cell_phone: val.phone_number ? Number(val.phone_number) : null,
-      ext: val.local_phone || null,
       department_id: Number(val.department),
       position: val.position,
       email: val.email || null,
       username: val.username || null,
-      role_id: val.role ? Number(val.role) : null
     };
+
+    // Solo enviar role_id si tiene permiso para asignar rol
+    if (this.canAssignRole() && val.role) {
+      updatePayload.role_id = Number(val.role);
+    }
 
     if (val.password && val.password.trim() !== '') {
       updatePayload.password = val.password;
@@ -202,7 +202,7 @@ export class UserInformation {
   }
 
   deleteUser() {
-    if (!confirm(`¿Está seguro que desea eliminar a ${this.user().name} ${this.user().last_name}?`)) {
+    if (!confirm(`¿Está seguro que desea eliminar a ${this.user().name} ${this.user().last_name}? (Esta acción aplicará soft-delete)`)) {
       return;
     }
 
@@ -214,7 +214,27 @@ export class UserInformation {
       },
       error: (err) => {
         console.error('Error deleting contact:', err);
-        alert('Error al eliminar el contacto.');
+        const errMsg = err.error?.error || 'Error al eliminar el contacto.';
+        alert(errMsg);
+      }
+    });
+  }
+
+  restoreUser() {
+    if (!confirm(`¿Está seguro que desea restaurar a ${this.user().name} ${this.user().last_name}?`)) {
+      return;
+    }
+
+    const id = this.user().id!;
+    this.usersService.restoreUser(id).subscribe({
+      next: () => {
+        alert('Contacto restaurado exitosamente.');
+        this.onSaved.emit();
+      },
+      error: (err) => {
+        console.error('Error restoring contact:', err);
+        const errMsg = err.error?.error || 'Error al restaurar el contacto.';
+        alert(errMsg);
       }
     });
   }
